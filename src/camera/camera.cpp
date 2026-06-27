@@ -64,15 +64,6 @@ void Camera::moveForward(float distance) {
     this->cameraDirectionChanged();
 }
 
-void Camera::moveBackward(float distance) {
-    this->position = position - normalizedDirection * distance;
-    this->cameraDirectionChanged();
-}
-
-void Camera::moveLeft(float distance) {
-    this->position = position - rightVector * distance;
-    this->cameraDirectionChanged();
-}
 
 void Camera::moveRight(float distance) {
     this->position = position + rightVector * distance;
@@ -91,30 +82,6 @@ void Camera::lookUp(float angle) {
         return;
     }
 
-    this->normalizedDirection = newDirection;
-    this->cameraDirectionChanged();
-}
-
-void Camera::lookDown(float angle) {
-    // Rotate the normalizedDirection around the rightVector
-    float radians = -angle * M_PI / 180.0f;
-    Vector3D newDirection = normalizedDirection * cos(radians) + upVector * sin(radians);
-    newDirection.normalize();
-
-    if(newDirection.dot(WORLD_UP) < -0.98f){
-        // Prevent looking too far down (around 10 degrees)
-        return;
-    }
-
-    this->normalizedDirection = newDirection;
-    this->cameraDirectionChanged();
-}
-
-void Camera::lookLeft(float angle) {
-    // Rotate the normalizedDirection around the upVector
-    float radians = angle * M_PI / 180.0f;
-    Vector3D newDirection = normalizedDirection * cos(radians) - rightVector * sin(radians);
-    newDirection.normalize();
     this->normalizedDirection = newDirection;
     this->cameraDirectionChanged();
 }

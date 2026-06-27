@@ -30,13 +30,9 @@ class Camera {
         void resetCameraDirectionChangedFlag();
 
         void moveForward(float distance);
-        void moveBackward(float distance);
-        void moveLeft(float distance);
         void moveRight(float distance);
 
         void lookUp(float angle);
-        void lookDown(float angle);
-        void lookLeft(float angle);
         void lookRight(float angle);
 };
 

@@ -2,7 +2,13 @@
 #include "../utils/logging.h"
 
 void display();
-void keyboardInput(unsigned char key, int x, int y);
+void keyboardInputDown(unsigned char key, int x, int y);
+void keyboardInputUp(unsigned char key, int x, int y);
+void handleKeyboardInput(int value);
+
+void passiveMouseMovement(int x, int y);
+
+bool heldKeys[256] = {false}; 
 
 
 static Renderer* rendererInstance = nullptr; // Global pointer to the Renderer instance
@@ -20,6 +26,9 @@ Renderer::Renderer(const Scene& scene, Camera& camera, int width, int height) : 
 
     this->width = width;
     this->height = height;
+    this->centerX = width / 2;
+    this->centerY = height / 2;
+
     rendererInstance = this;
 };
 
@@ -36,9 +45,20 @@ void Renderer::initGLUT(int argc, char** argv, const char* title){
     glutInitDisplayMode(GLUT_SINGLE);
     glutInitWindowSize(this->width, this->height);
     glutCreateWindow(title);
-
     glutDisplayFunc(display);
-    glutKeyboardFunc(keyboardInput);
+
+    glutKeyboardFunc(keyboardInputDown);
+    glutKeyboardUpFunc(keyboardInputUp);
+    glutIgnoreKeyRepeat(1);
+
+    glutPassiveMotionFunc(passiveMouseMovement);
+    glutMotionFunc(passiveMouseMovement);
+
+    glutTimerFunc(KEYBOARD_CALLBACK_INTERVAL, handleKeyboardInput, 0);
+
+    glutSetCursor(GLUT_CURSOR_NONE);
+    glutWarpPointer(this->centerX, this->centerY);
+    
 };
 
 void Renderer::updateFrameBuffer(){
@@ -77,48 +97,57 @@ void display(){
 
 }
 
-void keyboardInput(unsigned char key, int x, int y){
+void keyboardInputDown(unsigned char key, int x, int y){
+    // log(std::string("Key pressed: ") + std::to_string(key));
 
-    // log("Key pressed: " + std::to_string(key));
+    heldKeys[key] = true;
 
-    switch(key){
-        case 27: // ESC key
-            exit(0);
-            break;
+    if(key == 27){ // ESC key
+        exit(0);
+    }
+}
 
-        case 'w':
-            rendererInstance->camera.moveForward(100.0f);
-            break;
+void keyboardInputUp(unsigned char key, int x, int y){
+    // log(std::string("Key released: ") + std::to_string(key));
 
-        case 's':
-            rendererInstance->camera.moveBackward(100.0f);
-            break;
-        
-        case 'a':
-            rendererInstance->camera.moveLeft(100.0f);
-            break;
-        
-        case 'd':
-            rendererInstance->camera.moveRight(100.0f);
-            break;
+    heldKeys[key] = false;
+}
 
-        case 'k':
-            rendererInstance->camera.lookUp(5.0f);
-            break;
-        case 'h':
-            rendererInstance->camera.lookLeft(5.0f);
-            break;
-        case 'l':
-            rendererInstance->camera.lookRight(5.0f);
-            break;
-        case 'j':
-            rendererInstance->camera.lookDown(5.0f);
-            break;
+void handleKeyboardInput(int value){
+    // log("Handling keyboard input...");
 
-        default:
-            break;
+    if(heldKeys['w']){
+        rendererInstance->camera.moveForward(10.0f);
+    }
+    if(heldKeys['s']){
+        rendererInstance->camera.moveForward(-10.0f);
+    }
+    if(heldKeys['a']){
+        rendererInstance->camera.moveRight(-10.0f);
+    }
+    if(heldKeys['d']){
+        rendererInstance->camera.moveRight(10.0f);
     }
 
     glutPostRedisplay(); 
-    
+    glutTimerFunc(KEYBOARD_CALLBACK_INTERVAL, handleKeyboardInput, 0);
+}
+
+void passiveMouseMovement(int x, int y){
+    if(x == rendererInstance->centerX && y == rendererInstance->centerY){
+        return;
+    }
+
+    int deltaX = x - rendererInstance->centerX;
+    int deltaY = rendererInstance->centerY - y;
+
+    if(deltaX != 0 || deltaY != 0){
+        float sensitivity = MOUSE_SENSITIVITY; 
+
+        rendererInstance->camera.lookRight(deltaX * sensitivity);
+        rendererInstance->camera.lookUp(deltaY * sensitivity);
+
+        glutPostRedisplay();
+        glutWarpPointer(rendererInstance->centerX, rendererInstance->centerY); 
+    }
 }
