@@ -16,6 +16,7 @@ SRCS     := main.cpp \
             src/lightSource/lightSource.cpp \
             src/scene/scene.cpp \
             src/camera/camera.cpp \
+            src/renderer/rendererThread/renderThreadPool.cpp \
             src/renderer/renderer.cpp
 
 run: $(TARGET)

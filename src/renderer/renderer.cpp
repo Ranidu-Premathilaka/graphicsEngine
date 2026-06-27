@@ -1,5 +1,6 @@
 #include "renderer.h"
 #include "../utils/logging.h"
+#include "rendererThread/renderThreadPool.h"
 
 void display();
 void keyboardInputDown(unsigned char key, int x, int y);
@@ -30,10 +31,12 @@ Renderer::Renderer(const Scene& scene, Camera& camera, int width, int height) : 
     this->centerY = height / 2;
 
     rendererInstance = this;
+    this->threadPool = new RenderThreadPool(this);
 };
 
 Renderer::~Renderer() {
-    delete[] frameBuffer; 
+    delete[] frameBuffer;
+    delete threadPool;
 }
 
 void Renderer::run(){
@@ -61,18 +64,21 @@ void Renderer::initGLUT(int argc, char** argv, const char* title){
     
 };
 
-void Renderer::updateFrameBuffer(){
-        
-        for(int y = 0; y < height; ++y){
-            for(int x = 0; x < width; ++x){
-                Ray ray = camera.getNextRay(x - width / 2, y - height / 2);
-                Intensity intensity = scene.calculateIntensity(ray);
+void Renderer::workerTask(int workerId, int numOfWorkers){
+    for(int y = workerId; y < this->height; y += numOfWorkers){
+        for(int x = 0; x < this->width; ++x){
+            Ray ray = camera.getNextRay(x - this->width / 2, y - this->height / 2);
+            Intensity intensity = scene.calculateIntensity(ray);
 
-                frameBuffer[(y * width + x) * 3 + 0] = intensity.r;
-                frameBuffer[(y * width + x) * 3 + 1] = intensity.g;
-                frameBuffer[(y * width + x) * 3 + 2] = intensity.b;        
-            }
+            frameBuffer[(y * this->width + x) * 3 + 0] = intensity.r;
+            frameBuffer[(y * this->width + x) * 3 + 1] = intensity.g;
+            frameBuffer[(y * this->width + x) * 3 + 2] = intensity.b;        
         }
+    }
+}
+
+void Renderer::updateFrameBuffer(){
+    this->threadPool->startWorkers();
 }
 
 
@@ -142,10 +148,9 @@ void passiveMouseMovement(int x, int y){
     int deltaY = rendererInstance->centerY - y;
 
     if(deltaX != 0 || deltaY != 0){
-        float sensitivity = MOUSE_SENSITIVITY; 
 
-        rendererInstance->camera.lookRight(deltaX * sensitivity);
-        rendererInstance->camera.lookUp(deltaY * sensitivity);
+        rendererInstance->camera.lookRight(deltaX * MOUSE_SENSITIVITY);
+        rendererInstance->camera.lookUp(deltaY * MOUSE_SENSITIVITY);
 
         glutPostRedisplay();
         glutWarpPointer(rendererInstance->centerX, rendererInstance->centerY); 

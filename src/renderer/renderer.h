@@ -12,10 +12,16 @@
 #include "../camera/camera.h"
 #include "../scene/scene.h"
 
+class RenderThreadPool; // Forward declaration of the RenderThreadPool class
+
 class Renderer {
+    private:
+
     public:
         const Scene& scene;
         Camera& camera;
+        RenderThreadPool* threadPool;
+
         float* frameBuffer;
         int width, height;
         int centerX, centerY;
@@ -26,6 +32,7 @@ class Renderer {
 
         void run();
         void initGLUT(int argc, char** argv, const char* title);
+        void workerTask(int workerId, int numOfWorkers);
         void updateFrameBuffer();
 
 };
