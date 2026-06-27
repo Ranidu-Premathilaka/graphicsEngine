@@ -4,20 +4,6 @@
 
 // PRIVATE METHODS
 
-void Camera::updateToNextPixelCoordinates(){
-    if(this->currentPixelX == quarterViewport.width){
-        // Move to the next row
-        this->currentPixelX = -quarterViewport.width;
-        this->currentPixelY++;
-    }else{
-        this->currentPixelX++;
-    }
-
-    if(this->currentPixelY > quarterViewport.height){
-        this->haveMoreRays = false;
-    }
-}
-
 void Camera::cameraDirectionChanged() {
     this->viewPortCenter = position + normalizedDirection * focalLength;
 
@@ -26,6 +12,7 @@ void Camera::cameraDirectionChanged() {
 
     this->upVector = rightVector.cross(normalizedDirection);
     this->upVector.normalize();
+    this->cameraDirectionChangedFlag = true;
 }
 
 // PUBLIC METHODS
@@ -35,7 +22,6 @@ Camera::Camera(const Vector3D& position, const Vector3D& normalizedDirection, co
     this->normalizedDirection = normalizedDirection;
     this->normalizedDirection.normalize();
 
-    this->quarterViewport = {viewport.width/2, viewport.height/2};
     this->focalLength = viewport.width / (2.0f * tan(FOV * M_PI / 360.0f));
 
     this->rightVector = normalizedDirection.cross(WORLD_UP);
@@ -46,38 +32,30 @@ Camera::Camera(const Vector3D& position, const Vector3D& normalizedDirection, co
 
     this->viewPortCenter = position + normalizedDirection * focalLength;
 
-    resetScreen();
+    // This is so that the first image is rendered at first
+    this->cameraDirectionChangedFlag = true;
 }
 
-void Camera::resetScreen(){
-    this->currentPixelX = -quarterViewport.width -1;
-    this->currentPixelY = -quarterViewport.height;
-    this->haveMoreRays = true;
-}
 
-bool Camera::isScreenRendering(){
-    return this->haveMoreRays;
-}
-
-Ray Camera::getNextRay(){
+// Make sure this pixel is within the viewport bounds as checks aren't done for optimization purposes
+// This pixels should be relative to the venter of the viewport
+Ray Camera::getNextRay(int pixelX, int pixelY) const {
     Ray ray;
     ray.position = position;
 
-    updateToNextPixelCoordinates();
-
-    Vector3D pixelPosition = viewPortCenter + rightVector * currentPixelX + upVector * currentPixelY;
+    Vector3D pixelPosition = viewPortCenter + rightVector * pixelX + upVector * pixelY;
     ray.normalizedDirection = pixelPosition - position;
     ray.normalizedDirection.normalize();
 
     return ray; 
 }
 
-float Camera::getPixelX() const {
-    return (float)currentPixelX;
+bool Camera::hasCameraDirectionChanged() const {
+    return this->cameraDirectionChangedFlag;
 }
 
-float Camera::getPixelY() const {
-    return (float)currentPixelY;
+void Camera::resetCameraDirectionChangedFlag() {
+    this->cameraDirectionChangedFlag = false;
 }
 
 // Movement methods

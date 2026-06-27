@@ -26,6 +26,9 @@ $(TARGET): $(SRCS)
 
 compile: $(TARGET)
 
+time: $(TARGET)
+	zsh -c "time ./$(TARGET) test"
+
 clean:
 	rm -f $(TARGET)
 

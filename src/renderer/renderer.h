@@ -2,26 +2,28 @@
 #define RENDERER_H
 
 #define GL_SILENCE_DEPRECATION
+#define STARTING_POINT_X -1
+#define STARTING_POINT_Y -1
+
 #include <GLUT/glut.h>
 
 #include "../camera/camera.h"
 #include "../scene/scene.h"
 
-typedef struct {
-    float r, g, b;
-    float x, y;
-} Pixel;
-
-
 class Renderer {
     public:
         const Scene& scene;
         Camera& camera;
+        float* frameBuffer;
+        int width, height;
 
-        Renderer(const Scene& scene, Camera& camera);
+
+        Renderer(const Scene& scene, Camera& camera, int width, int height);
+        ~Renderer();
 
         void run();
-        void init(int argc, char** argv, int width, int height, const char* title);
+        void initGLUT(int argc, char** argv, const char* title);
+        void updateFrameBuffer();
 
 };
 

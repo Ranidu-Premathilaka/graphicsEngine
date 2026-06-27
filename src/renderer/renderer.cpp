@@ -11,64 +11,76 @@ static Renderer* rendererInstance = nullptr; // Global pointer to the Renderer i
 
 
 // PUBLIC METHODS
-Renderer::Renderer(const Scene& scene, Camera& camera) : scene(scene), camera(camera) {};
+Renderer::Renderer(const Scene& scene, Camera& camera, int width, int height) : scene(scene), camera(camera) {
+    frameBuffer = new float[width * height * 6]; 
+    if(frameBuffer == nullptr){
+        log("Failed to allocate memory for frame buffer.");
+        exit(EXIT_FAILURE);
+    }
+
+    this->width = width;
+    this->height = height;
+    rendererInstance = this;
+};
+
+Renderer::~Renderer() {
+    delete[] frameBuffer; 
+}
 
 void Renderer::run(){
-    rendererInstance = this;
+    glutPostRedisplay(); 
     glutMainLoop();
 };
-void Renderer::init(int argc, char** argv, int width, int height, const char* title){
+void Renderer::initGLUT(int argc, char** argv, const char* title){
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE);
-    glutInitWindowSize(width, height);
+    glutInitWindowSize(this->width, this->height);
     glutCreateWindow(title);
-
-    glClearColor(1.0, 1.0, 1.0, 1.0);  // Default White background
-    glMatrixMode(GL_PROJECTION);
-    gluOrtho2D(-width/2, width/2, -height/2, height/2);
 
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboardInput);
-    // glutIdleFunc();
 };
 
+void Renderer::updateFrameBuffer(){
+        
+        for(int y = 0; y < height; ++y){
+            for(int x = 0; x < width; ++x){
+                Ray ray = camera.getNextRay(x - width / 2, y - height / 2);
+                Intensity intensity = scene.calculateIntensity(ray);
 
-// Internal GLUT callback functions
-void drawPoint(Pixel pixel){
-
-    glColor3f(pixel.r, pixel.g, pixel.b);
-    glBegin(GL_POINTS);
-    glVertex2f(pixel.x, pixel.y);
-    glEnd();
+                frameBuffer[(y * width + x) * 3 + 0] = intensity.r;
+                frameBuffer[(y * width + x) * 3 + 1] = intensity.g;
+                frameBuffer[(y * width + x) * 3 + 2] = intensity.b;        
+            }
+        }
 }
 
+
 void display(){
-    glClear(GL_COLOR_BUFFER_BIT);
-    
-    log("Rendering started...");
 
-    while(rendererInstance->camera.isScreenRendering()){
-        Ray ray = rendererInstance->camera.getNextRay();
-        Intensity intensity = rendererInstance->scene.calculateIntensity(ray);
-
-        Pixel pixel;
-
-        pixel.x = rendererInstance->camera.getPixelX();
-        pixel.y = rendererInstance->camera.getPixelY();
-
-        pixel.r = intensity.r;
-        pixel.g = intensity.g;
-        pixel.b = intensity.b;        
-
-        drawPoint(pixel);
+    if(!rendererInstance->camera.hasCameraDirectionChanged()){
+        return;
     }
+    rendererInstance->updateFrameBuffer();
 
+    glClear(GL_COLOR_BUFFER_BIT);
+    glRasterPos2i(STARTING_POINT_X, STARTING_POINT_Y); 
+
+    glDrawPixels(
+        rendererInstance->width,
+        rendererInstance->height,
+        GL_RGB,
+        GL_FLOAT,
+        rendererInstance->frameBuffer
+    );
     glutSwapBuffers();
 
-    rendererInstance->camera.resetScreen();
 }
 
 void keyboardInput(unsigned char key, int x, int y){
+
+    // log("Key pressed: " + std::to_string(key));
+
     switch(key){
         case 27: // ESC key
             exit(0);

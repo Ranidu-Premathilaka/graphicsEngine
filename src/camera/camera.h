@@ -17,21 +17,17 @@ class Camera {
         Vector3D upVector;
         Vector3D rightVector;
         Vector3D viewPortCenter;
-        ViewPort quarterViewport;
         float focalLength;
-        int currentPixelX, currentPixelY;
-        bool haveMoreRays = true;
+        bool cameraDirectionChangedFlag;
     
     void updateToNextPixelCoordinates();
     void cameraDirectionChanged();
 
     public:
         Camera(const Vector3D& position, const Vector3D& normalizedDirection, const ViewPort& viewport, int FOV);
-        void resetScreen();
-        bool isScreenRendering();
-        Ray getNextRay();
-        float getPixelX() const;
-        float getPixelY() const;
+        Ray getNextRay(int pixelX, int pixelY) const;
+        bool hasCameraDirectionChanged() const;
+        void resetCameraDirectionChangedFlag();
 
         void moveForward(float distance);
         void moveBackward(float distance);
