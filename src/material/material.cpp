@@ -9,7 +9,7 @@ Material::Material(const Intensity& ambient, const Intensity& diffuse, const Int
     : ambientIntensity(ambient), diffuseIntensity(diffuse), specularIntensity(specular), shininess(shininess), emissiveIntensity(emissive) {}
 
 
-Intensity Material::getActualLightIntensity(Intensity lightIntensity, Vector3D viewDirection, Vector3D intersectionNormal, Vector3D lightDirection) const {
+Intensity Material::getLightDependentIntensity(Intensity lightIntensity, Vector3D viewDirection, Vector3D intersectionNormal, Vector3D lightDirection) const {
 
     Intensity tempIntensity(0, 0, 0);
 
@@ -30,9 +30,9 @@ Intensity Material::getActualLightIntensity(Intensity lightIntensity, Vector3D v
     double specularReflection = std::pow(reflectionDirection.dot(viewDirection), this->shininess);
     tempIntensity = tempIntensity + (this->specularIntensity * specularReflection);
 
-    return tempIntensity * lightIntensity + this->emissiveIntensity;
+    return tempIntensity * lightIntensity;
 }
 
-Intensity Material::getAmbientIntensity(Intensity ambientSceneIntensity) const {
-    return this->ambientIntensity * ambientSceneIntensity;
+Intensity Material::getLightIndependentIntensity(Intensity ambientSceneIntensity) const {
+    return this->ambientIntensity * ambientSceneIntensity + this->emissiveIntensity;
 }

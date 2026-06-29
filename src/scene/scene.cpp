@@ -53,7 +53,7 @@ Intensity Scene::calculateIntensity(const Ray& ray) const {
 
     if (closestIntersection.hit == IntersectionHitType::Hit) {
         // Might not be needed as material specific ambient intensity seems silly
-        Intensity totalIntensity = closestIntersection.material->getAmbientIntensity(this->ambientIntensity);
+        Intensity totalIntensity = closestIntersection.material->getLightIndependentIntensity(this->ambientIntensity);
 
         for (const LightSource* lightSource : lightSources) {
             Vector3D lightDirection = lightSource->lightDirectionFrom(closestIntersection.point);
@@ -69,7 +69,7 @@ Intensity Scene::calculateIntensity(const Ray& ray) const {
                 continue; 
             }
 
-            totalIntensity = totalIntensity + closestIntersection.material->getActualLightIntensity(
+            totalIntensity = totalIntensity + closestIntersection.material->getLightDependentIntensity(
                 lightSource->getIntensity(),
                 -ray.normalizedDirection,
                 closestIntersection.normal,

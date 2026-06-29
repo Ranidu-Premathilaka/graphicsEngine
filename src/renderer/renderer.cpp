@@ -3,9 +3,7 @@
 #include "rendererThread/renderThreadPool.h"
 
 void display();
-void keyboardInputDown(unsigned char key, int x, int y);
-void keyboardInputUp(unsigned char key, int x, int y);
-void handleKeyboardInput(int value);
+void handleKeyboardInput(unsigned char key, int x, int y);
 
 void passiveMouseMovement(int x, int y);
 
@@ -50,14 +48,11 @@ void Renderer::initGLUT(int argc, char** argv, const char* title){
     glutCreateWindow(title);
     glutDisplayFunc(display);
 
-    glutKeyboardFunc(keyboardInputDown);
-    glutKeyboardUpFunc(keyboardInputUp);
-    glutIgnoreKeyRepeat(1);
+    glutKeyboardFunc(handleKeyboardInput);
 
     glutPassiveMotionFunc(passiveMouseMovement);
     glutMotionFunc(passiveMouseMovement);
 
-    glutTimerFunc(KEYBOARD_CALLBACK_INTERVAL, handleKeyboardInput, 0);
 
     glutSetCursor(GLUT_CURSOR_NONE);
     glutWarpPointer(this->centerX, this->centerY);
@@ -103,40 +98,28 @@ void display(){
 
 }
 
-void keyboardInputDown(unsigned char key, int x, int y){
-    // log(std::string("Key pressed: ") + std::to_string(key));
 
-    heldKeys[key] = true;
-
-    if(key == 27){ // ESC key
-        exit(0);
-    }
-}
-
-void keyboardInputUp(unsigned char key, int x, int y){
-    // log(std::string("Key released: ") + std::to_string(key));
-
-    heldKeys[key] = false;
-}
-
-void handleKeyboardInput(int value){
-    // log("Handling keyboard input...");
-
-    if(heldKeys['w']){
-        rendererInstance->camera.moveForward(10.0f);
-    }
-    if(heldKeys['s']){
-        rendererInstance->camera.moveForward(-10.0f);
-    }
-    if(heldKeys['a']){
-        rendererInstance->camera.moveRight(-10.0f);
-    }
-    if(heldKeys['d']){
-        rendererInstance->camera.moveRight(10.0f);
+void handleKeyboardInput(unsigned char key, int x, int y) {
+    switch(key) {
+        case 27: // ESC key
+            exit(0);
+        case 'w':
+            rendererInstance->camera.moveForward(1.0f);
+            break;
+        case 's':
+            rendererInstance->camera.moveForward(-1.0f);
+            break;
+        case 'a':
+            rendererInstance->camera.moveRight(-1.0f);
+            break;
+        case 'd':
+            rendererInstance->camera.moveRight(1.0f);
+            break;
+        default:
+            break;
     }
 
-    glutPostRedisplay(); 
-    glutTimerFunc(KEYBOARD_CALLBACK_INTERVAL, handleKeyboardInput, 0);
+    glutPostRedisplay();
 }
 
 void passiveMouseMovement(int x, int y){

@@ -4,6 +4,7 @@
 #include "src/renderer/renderer.h"
 #include "src/camera/camera.h"
 #include "src/objects/sphere.h"
+#include "src/objects/triangle.h"
 #include "src/lightSource/lightSource.h"
 
 void testPerformance() {
@@ -48,19 +49,21 @@ int main(int argc, char** argv) {
     );
 
     Sphere bigSphere(
-        Vector3D(8000, 0, 0),
-        2000.0f,
+        Vector3D(48, 0, 0),
+        12.0f,
         matte
     );
 
-    Sphere smallSphere(
-        Vector3D(3000, 0, 0),
-        500.0f,
+    // facing the light
+    Triangle triangle(
+        Vector3D(24, 3, 3),
+        Vector3D(24, 3, -3),
+        Vector3D(24, 0, 3), 
         metal
     );
 
     scene.addObject(&bigSphere);
-    scene.addObject(&smallSphere);
+    scene.addObject(&triangle);
 
     LightSource lightSource(
         Vector3D(0, 0, 0),   

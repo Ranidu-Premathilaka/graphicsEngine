@@ -21,8 +21,8 @@ public:
          const Intensity& emissive = Intensity(0, 0, 0)
     );
 
-    Intensity getActualLightIntensity(Intensity lightIntensity, Vector3D viewDirection, Vector3D intersectionNormal, Vector3D lightDirection) const;
-    Intensity getAmbientIntensity(Intensity ambientSceneIntensity) const;
+    Intensity getLightDependentIntensity(Intensity lightIntensity, Vector3D viewDirection, Vector3D intersectionNormal, Vector3D lightDirection) const;
+    Intensity getLightIndependentIntensity(Intensity ambientSceneIntensity) const;
 
 };
 
