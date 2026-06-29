@@ -15,6 +15,10 @@ Vector3D Vector3D::operator*(double scalar) const {
     return Vector3D(x * scalar, y * scalar, z * scalar);
 }
 
+Vector3D Vector3D::operator-() const {
+        return Vector3D(-x, -y, -z);
+}
+
 void Vector3D::normalize() {
     float length = std::sqrt(x * x + y * y + z * z);
     if (length > 0) {

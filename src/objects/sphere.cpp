@@ -1,14 +1,7 @@
 #include "sphere.h"
 #include <cmath>
 
-Sphere::Sphere(const Vector3D& center, float radius) : center(center), radius(radius) {}
-
-void Sphere::setIntensities(const Intensity& ambient, const Intensity& diffuse, const Intensity& specular, float shininess) {
-    this->ambientIntensity = ambient;
-    this->diffuseIntensity = diffuse;
-    this->specularIntensity = specular;
-    this->shininess = shininess;
-}
+Sphere::Sphere(const Vector3D& center, float radius, const Material& material) : center(center), radius(radius), material(material) {}
 
 IntersectionInfo Sphere::intersect(const Ray& ray) const {
     IntersectionInfo info;
@@ -31,6 +24,7 @@ IntersectionInfo Sphere::intersect(const Ray& ray) const {
             info.normal = (info.point - center);
             info.normal.normalize();
             info.distance = smallestT;
+            info.material = &material;
             info.hit = IntersectionHitType::Hit;
         } else {
             info.hit = IntersectionHitType::Behind;
@@ -39,26 +33,4 @@ IntersectionInfo Sphere::intersect(const Ray& ray) const {
         info.hit = IntersectionHitType::None;
     }
     return info;
-}
-
-Vector3D Sphere::getNormalAt(const Vector3D& point) const {
-    Vector3D normal = point - center;
-    normal.normalize();
-    return normal;
-}
-
-Intensity Sphere::getMaterialAmbientIntensity() const {
-    return ambientIntensity;
-}
-
-Intensity Sphere::getMaterialDiffuseIntensity() const {
-    return diffuseIntensity;
-}
-
-Intensity Sphere::getMaterialSpecularIntensity() const {
-    return specularIntensity;
-}
-
-float Sphere::getMaterialShininess() const {
-    return shininess;
 }

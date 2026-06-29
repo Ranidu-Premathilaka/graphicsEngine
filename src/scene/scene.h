@@ -5,17 +5,13 @@
 #include "../lightSource/lightSource.h"
 #include <vector>
 
-typedef struct {
-    IntersectionInfo intersection;
-    const Object* object;
-} ObjectIntersectionInfo;
-
 class Scene{
     private:
         std::vector<Object*> objects;
         std::vector<LightSource*> lightSources;
         Intensity ambientIntensity, backgroundIntensity;
-        ObjectIntersectionInfo traceRay(const Ray& ray) const;
+        IntersectionInfo traceRay(const Ray& ray) const;
+        bool isShadowed(const Vector3D& point, const Vector3D& lightDirection, double lightDistance) const;
 
     public:
         Scene(Intensity ambientIntensity = Intensity(0.1f, 0.1f, 0.1f), Intensity backgroundIntensity = Intensity(0.0f, 0.0f, 0.0f));

@@ -13,6 +13,7 @@ class LightSource {
         LightSource(const Vector3D& position, const Intensity& intensity);
 
         Vector3D lightDirectionFrom(const Vector3D& point) const;
+        double distanceFrom(const Vector3D& point) const;
         Intensity getIntensity() const;
 };
 

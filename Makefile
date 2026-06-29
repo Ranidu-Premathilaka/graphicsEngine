@@ -12,6 +12,7 @@ SRCS     := main.cpp \
             src/utils/logging.cpp \
             src/intensity/intensity.cpp \
             src/math/vector3D.cpp \
+            src/material/material.cpp \
             src/objects/sphere.cpp \
             src/lightSource/lightSource.cpp \
             src/scene/scene.cpp \
