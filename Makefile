@@ -13,8 +13,8 @@ SRCS     := main.cpp \
             src/intensity/intensity.cpp \
             src/math/vector3D.cpp \
             src/material/material.cpp \
-            src/objects/sphere.cpp \
-            src/objects/triangle.cpp \
+            src/objects/primitive/sphere.cpp \
+            src/objects/primitive/triangle.cpp \
             src/lightSource/lightSource.cpp \
             src/scene/scene.cpp \
             src/camera/camera.cpp \

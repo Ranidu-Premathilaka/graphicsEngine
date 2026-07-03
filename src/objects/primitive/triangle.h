@@ -1,9 +1,9 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
-#include "../core/object.h"
-#include "../intensity/intensity.h"
-#include "../core/constants.h"
+#include "../../core/object.h"
+#include "../../intensity/intensity.h"
+#include "../../core/constants.h"
 
 class Triangle : public Object {
 private:
