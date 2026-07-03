@@ -3,8 +3,8 @@
 #include "src/scene/scene.h"
 #include "src/renderer/renderer.h"
 #include "src/camera/camera.h"
-#include "src/objects/sphere.h"
-#include "src/objects/triangle.h"
+#include "src/objects/primitive/sphere.h"
+#include "src/objects/primitive/triangle.h"
 #include "src/lightSource/lightSource.h"
 
 void testPerformance() {

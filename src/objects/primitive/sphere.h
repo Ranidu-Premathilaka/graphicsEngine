@@ -1,8 +1,8 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include "../core/object.h"
-#include "../intensity/intensity.h"
+#include "../../core/object.h"
+#include "../../intensity/intensity.h"
 
 class Sphere : public Object {
 private:
